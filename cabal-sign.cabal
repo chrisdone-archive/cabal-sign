@@ -1,5 +1,5 @@
 name:                cabal-sign
-version:             0.3.1.0
+version:             0.3.1.1
 synopsis:            Sign and verify Cabal packages.
 description:         Sign and verify Cabal packages.
 license:             BSD3
@@ -16,7 +16,6 @@ executable cabal-sign
   hs-source-dirs:      src
   build-depends:       base > 4 && < 5,
                        SHA2,
-                       optparse-applicative,
                        zlib,
                        tar,
                        bytestring,

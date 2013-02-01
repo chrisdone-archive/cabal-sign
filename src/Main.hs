@@ -8,6 +8,7 @@ import qualified Codec.Archive.Tar.Entry as Tar
 import qualified Codec.Compression.GZip as Gzip
 import           Data.ByteString.Lazy (ByteString)
 import qualified Data.ByteString.Lazy as L
+import qualified Data.ByteString as S
 import qualified Codec.Digest.SHA as Sha2
 import           Data.List
 import           Data.Serialize
@@ -31,7 +32,7 @@ sumAndSign fp = do
   exists <- doesFileExist fp
   if not exists
      then error $ fp ++ " doesn't exist"
-     else do gzip <- L.readFile fp
+     else do gzip <- fmap (L.fromChunks . return) (S.readFile fp)
              entries <- getGzipEntries gzip
              L.writeFile sum (checksum entries)
              rawSystem "gpg" ["--detach-sign",sum]
@@ -47,8 +48,7 @@ addSignature gz sig entries = do
     Left err -> error err
     Right spath -> do
       let sigEntry = Tar.fileEntry spath signature
-      L.writeFile (translate ".signed.tar.gz" gz)
-                  (Gzip.compress (Tar.write (sigEntry : entries)))
+      L.writeFile gz (Gzip.compress (Tar.write (sigEntry : entries)))
       removeFile sig
 
 projectName = dropWhile (=='-') . translate "" . takeFileName

@@ -8,7 +8,7 @@ import qualified Codec.Archive.Tar.Entry as Tar
 import qualified Codec.Compression.GZip as Gzip
 import           Data.ByteString.Lazy (ByteString)
 import qualified Data.ByteString.Lazy as L
-import qualified Data.Digest.Pure.MD5 as Md5
+import qualified Codec.Digest.SHA as Sha2
 import           Data.List
 import           Data.Serialize
 import           Data.String
@@ -74,18 +74,18 @@ checksum entries = L.intercalate "\n" (filter (not . L.null) (map hashEntry (sor
 hashEntry :: EntryContent -> ByteString
 hashEntry entry =
   case entry of
-    NormalFile bytes _          -> hexify (Md5.md5 bytes)
+    NormalFile bytes _          -> hashHex bytes
     SymbolicLink target         -> encodeTarget target
     HardLink target             -> encodeTarget target
-    OtherEntryType typ bytes _  -> hexify (Md5.md5 (L.cons (word typ) bytes))
+    OtherEntryType typ bytes _  -> hashHex (L.cons (word typ) bytes)
     CharacterDevice major minor -> L.cons (word 'c') (L.concat [iword major,iword minor])
     BlockDevice major minor     -> L.cons (word 'b') (L.concat [iword major,iword minor])
     _ -> L.empty
 
   where encodeTarget = fromString . Tar.fromLinkTarget
         iword = fromString . show
-        hexify = fromString . show
         word = fromIntegral . fromEnum
+        hashHex = fromString . Sha2.showBSasHex . Sha2.hash Sha2.SHA256
 
 verify :: FilePath -> IO ()
 verify fp = do

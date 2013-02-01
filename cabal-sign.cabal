@@ -1,6 +1,7 @@
 name:                cabal-sign
-version:             0.1.0.0
+version:             0.2.0.0
 synopsis:            Sign and verify Cabal packages.
+description:         Sign and verify Cabal packages.
 license:             BSD3
 license-file:        LICENSE
 author:              Chris Done
@@ -14,7 +15,7 @@ executable cabal-sign
   ghc-options: -O2
   hs-source-dirs:      src
   build-depends:       base > 4 && < 5,
-                       pureMD5,
+                       SHA2,
                        optparse-applicative,
                        zlib,
                        tar,

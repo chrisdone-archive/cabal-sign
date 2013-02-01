@@ -51,7 +51,10 @@ addSignature gz sig entries = do
                   (Gzip.compress (Tar.write (sigEntry : entries)))
       removeFile sig
 
-makeSigName = translate ".sig" . takeFileName
+projectName = dropWhile (=='-') . translate "" . takeFileName
+
+makeSigName gz = projectName gz </> filename gz where
+  filename = translate ".sig" . reverse . drop 1 . dropWhile (/='-') . reverse . takeFileName
 
 translate ext = (++ ext) . dropSigned . dropExtension . dropExtension where
   dropSigned x | isSuffixOf ".signed" x = dropExtension x

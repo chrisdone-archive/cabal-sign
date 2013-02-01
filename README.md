@@ -31,7 +31,7 @@ Next, sign your distribution:
 
 Now upload the signed version to Hackage:
 
-    chris@midnight:~/Projects/me/fay$ cabal upload dist/fay-0.12.0.1.signed.tar.gz
+    chris@midnight:~/Projects/me/fay$ cabal upload dist/fay-0.12.0.1.tar.gz
 
 ## Verifying packages
 

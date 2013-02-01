@@ -72,7 +72,7 @@ getGzipEntries gzip =
                                  (Tar.read (Gzip.decompress gzip))
 
 checksum :: [Entry] -> ByteString
-checksum entries = L.intercalate "\n" (filter (not . L.null) (map hashEntry (sort (map Tar.entryContent entries))))
+checksum entries = L.intercalate "\n" (filter (not . L.null) (map hashEntry (map Tar.entryContent entries)))
 
 hashEntry :: EntryContent -> ByteString
 hashEntry entry =

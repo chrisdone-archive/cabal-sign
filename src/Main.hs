@@ -41,8 +41,12 @@ sumAndSign fp = do
      then error $ fp ++ " doesn't exist"
      else do gzip <- fmap (L.fromChunks . return) (S.readFile fp)
              entries <- getGzipEntries gzip
-             _ <- rawSystem "gpg" ["--detach-sign",fp]
-             addSignature fp (fp <.> "sig") entries
+             L.writeFile tar (Gzip.decompress gzip)
+             _ <- rawSystem "gpg" ["--detach-sign",tar]
+             addSignature fp (tar <.> "sig") entries
+             removeFile tar
+
+  where tar = translate ".tar" fp
 
 addSignature :: FilePath -> FilePath -> [Entry] -> IO ()
 addSignature gz sig entries = do
@@ -88,7 +92,7 @@ verify fp = do
              case find isSig entries of
                Nothing -> error $ "unable to find " ++ sigName ++ " in archive"
                Just entry -> do
-                 L.writeFile stripped (Gzip.compress (Tar.write (filter (not . isSig) entries)))
+                 L.writeFile stripped (Tar.write (filter (not . isSig) entries))
                  L.writeFile sig (getEntryFileContent entry)
                  _ <- rawSystem "gpg" ["--verify",sig,stripped]
                  removeFile stripped
